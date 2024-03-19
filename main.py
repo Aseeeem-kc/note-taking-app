@@ -15,7 +15,7 @@ food_items = {
 }
 
 @app.get("/get_items/{cuisine}")
-async def get_items(cuisine: AvailableCuisines):
+def get_items(cuisine: AvailableCuisines):
     
     return food_items.get(cuisine)
 
