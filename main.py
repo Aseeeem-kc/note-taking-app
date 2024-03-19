@@ -25,7 +25,8 @@ def get_items(cuisine: AvailableCuisines):
 coupon_code = {
     1: '10%',
     2: '20%',
-    3: '30%'
+    3: '30%',
+    4: '40%'
 }
 
 @app.get("/get_coupon/{code}")
