@@ -1,6 +1,7 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
-from fastapi import FastAPI, HTTPException
 from typing import List
 
 class Note(BaseModel):
@@ -12,7 +13,14 @@ class Note(BaseModel):
 
 
 app = FastAPI()
-
+# Enable CORS (Cross-Origin Resource Sharing)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:5500"],  # Replace with the origin of your frontend
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 notes_db = []
 
 @app.post("/notes/")
