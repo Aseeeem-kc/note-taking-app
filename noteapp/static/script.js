@@ -1,73 +1,124 @@
-// Function to fetch all notes from the backend
-async function fetchNotes() {
-    const response = await fetch('http://127.0.0.1:8000/notes/');
-    const notes = await response.json();
-    return notes;
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const addNoteForm = document.getElementById('addNoteForm');
+    const notesContainer = document.getElementById('notesContainer');
 
-// Function to render notes on the page
-async function renderNotes() {
-    const notes = await fetchNotes();
-    const notesContainer = document.getElementById('notesContainer'); // Update to correct ID
-    // Clear previous content
-    notesContainer.innerHTML = '';
-    notes.forEach(note => {
-        const noteElement = document.createElement('div');
-        noteElement.innerHTML = `
-            <h2>${note.title}</h2>
-            <p>${note.content}</p>
-            <button onclick="editNote(${note.id})">Edit</button>
-            <button onclick="deleteNote(${note.id})">Delete</button>
-        `;
-        notesContainer.appendChild(noteElement);
+    addNoteForm.addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        const formData = new FormData(addNoteForm); // Get form data
+
+        // Convert form data to JSON object
+        const noteData = {};
+        formData.forEach((value, key) => {
+            noteData[key] = value;
+        });
+
+        // Send POST request to create a new note
+        try {
+            const response = await fetch('http://127.0.0.1:8000/notes/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(noteData) // Convert data to JSON string
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add note');
+            }
+
+            // Clear the form after successful submission
+            addNoteForm.reset();
+
+            // Reload notes after adding a new one
+            loadNotes();
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
     });
-}
 
-
-// Function to add a new note
-async function addNote() {
-    const form = document.getElementById('addNoteForm');
-    const formData = new FormData(form);
-    const response = await fetch('http://127.0.0.1:8000/notes/', {
-        method: 'POST',
-        body: formData
-    });
-    if (response.ok) {
-        renderNotes();
-        form.reset(); // Reset the form fields
-    } else {
-        alert('Failed to add note');
-        console.log(response.status);
-console.log(await response.text());
-
+    // Function to load notes from the server
+    async function loadNotes() {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/notes/');
+            const notes = await response.json();
+            displayNotes(notes);
+        } catch (error) {
+            console.error('Error loading notes:', error);
+        }
     }
-}
 
-// Function to delete a note
-async function deleteNote(noteId) {
-    const response = await fetch(`http://127.0.0.1:8000/notes/${noteId}`, {
-        method: 'DELETE'
-    });
-    if (response.ok) {
-        renderNotes();
-    } else {
-        alert('Failed to delete note');
+    // Function to display notes in the container
+    function displayNotes(notes) {
+        notesContainer.innerHTML = '';
+        notes.forEach((note, index) => {
+            const noteElement = document.createElement('div');
+            noteElement.className = 'note bg-gray-100 rounded-md p-4 mb-4';
+            noteElement.innerHTML = `<h3 class="text-lg font-semibold mb-2">${note.title}</h3><p>${note.content}</p>`;
+            notesContainer.appendChild(noteElement);
+
+            // Add update and delete buttons
+            const updateButton = document.createElement('button');
+            updateButton.textContent = 'Update';
+            updateButton.className = 'bg-gray-700 text-white py-2 px-4 rounded-md mr-2 transition duration-300 hover:bg-gray-600';
+
+            updateButton.addEventListener('click', async function () {
+                // Prompt user for updated content
+                const updatedContent = prompt('Enter updated content:', note.content);
+                if (updatedContent !== null) {
+                    // Send PUT request to update the note
+                    try {
+                        const response = await fetch(`http://127.0.0.1:8000/notes/${index}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ title: note.title, content: updatedContent })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to update note');
+                        }
+
+                        // Reload notes after updating
+                        loadNotes();
+                    } catch (error) {
+                        console.error('Error updating note:', error);
+                    }
+                }
+            });
+            noteElement.appendChild(updateButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'bg-black text-white py-2 px-4 rounded-md transition duration-300 hover:bg-gray-800';
+
+
+            deleteButton.addEventListener('click', async function () {
+                // const confirmDelete = confirm('Are you sure you want to delete this note?');
+                const confirmDelete = true
+                if (confirmDelete) {
+                    // Send DELETE request to delete the note
+                    try {
+                        const response = await fetch(`http://127.0.0.1:8000/notes/${index}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to delete note');
+                        }
+
+                        // Reload notes after deletion
+                        loadNotes();
+                    } catch (error) {
+                        console.error('Error deleting note:', error);
+                    }
+                }
+            });
+            noteElement.appendChild(deleteButton);
+        });
     }
-}
 
-// Function to edit a note (not implemented in this example)
-function editNote(noteId) {
-    // Implement edit functionality if needed
-    alert('Edit functionality not implemented in this example');
-}
-
-// Render initial notes when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    renderNotes();
-});
-
-// Attach event listener to the form submission
-document.getElementById('addNoteForm').addEventListener('submit', (event) => {
-    event.preventDefault(); // Prevent default form submission
-    addNote(); // Call addNote function to add a new note
+    // Load notes when the page loads
+    loadNotes();
 });
