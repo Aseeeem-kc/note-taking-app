@@ -63,9 +63,23 @@ document.addEventListener('DOMContentLoaded', function () {
             updateButton.className = 'bg-gray-700 text-white py-2 px-4 rounded-md mr-2 transition duration-300 hover:bg-gray-600';
 
             updateButton.addEventListener('click', async function () {
-                // Prompt user for updated content
-                const updatedContent = prompt('Enter updated content:', note.content);
-                if (updatedContent !== null) {
+                const textarea = document.createElement('textarea');
+                textarea.className = 'note-content w-full px-4 py-2 rounded-md border border-gray-300 mb-4';
+                textarea.value = note.content;
+
+                // Replace the paragraph with the textarea for editing
+                noteElement.replaceChild(textarea, noteElement.querySelector('p'));
+                
+                // Create a save button
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Save';
+                saveButton.className = 'bg-blue-500 text-white py-2 px-4 rounded-md mr-2 transition duration-300 hover:bg-blue-600';
+
+                // Save button event listener
+                saveButton.addEventListener('click', async function () {
+                    // Get the updated content from the textarea
+                    const updatedContent = textarea.value;
+
                     // Send PUT request to update the note
                     try {
                         const response = await fetch(`http://127.0.0.1:8000/notes/${index}`, {
@@ -85,18 +99,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     } catch (error) {
                         console.error('Error updating note:', error);
                     }
-                }
+                });
+
+                // Replace update button with save button
+                noteElement.replaceChild(saveButton, updateButton);
             });
+
+            // Add update button to note element
             noteElement.appendChild(updateButton);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Delete';
             deleteButton.className = 'bg-black text-white py-2 px-4 rounded-md transition duration-300 hover:bg-gray-800';
 
-
             deleteButton.addEventListener('click', async function () {
                 // const confirmDelete = confirm('Are you sure you want to delete this note?');
-                const confirmDelete = true
+                const confirmDelete = true;
                 if (confirmDelete) {
                     // Send DELETE request to delete the note
                     try {
