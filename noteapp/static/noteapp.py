@@ -9,9 +9,6 @@ class Note(BaseModel):
     content: str
     created_at: datetime = datetime.now()
 
-
-
-
 app = FastAPI()
 # Enable CORS (Cross-Origin Resource Sharing)
 app.add_middleware(

@@ -8,24 +8,76 @@
     <style>
         .container {
             width: 60%;
+            background-color: rgba(255, 255, 255, 0.5); /* Slightly transparent white */
+            border-radius: 16px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
         body {
-            background: linear-gradient(120deg, #fefffb, #6a6d6b, #9eada9, #1d2520);
+            background-image: url("themes/1theme.jpg"); /* Default background image */
+            background-repeat: no-repeat;
+            background-size: cover;
+            transition: background-image 0.5s; /* Transition for background image */
+        }
+        body.dark-mode {
+            background-image: url("themes/2theme.jpg"); /* Dark theme background image */
+            color: #000000;
+        }
+        .theme-toggle {
+            display: inline-block;
+            width: 50px;
+            height: 25px;
+            right:0;
+            position: relative;
+            cursor: pointer;
+        }
+        .theme-toggle input[type="checkbox"] {
+            display: none;
+        }
+        .theme-toggle .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 25px;
+        }
+        .theme-toggle .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2.5px;
+            bottom: 2.5px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .theme-toggle input[type="checkbox"]:checked + .slider {
+            background-color: #2196F3;
+        }
+        .theme-toggle input[type="checkbox"]:checked + .slider:before {
+            transform: translateX(25px);
         }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-center">
     <div class="container bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-3xl font-semibold mb-4">Note Taking App</h1>
-        <form id="addNoteForm" class="mb-4">
+        <div class="theme-toggle">
+            <input type="checkbox" id="themeToggle">
+            <label class="slider" for="themeToggle"></label>
+        </div>
+        <h1 class="text-3xl font-semibold mb-4">Create notes</h1>
+        <form id="addNoteForm" class="mb-4">    
             <label for="title" class="block mb-2">Title:</label>
             <input type="text" id="title" name="title" class="w-full px-4 py-2 rounded-md border border-gray-300 mb-4" required>
             <label for="content" class="block mb-2">Content:</label>
             <textarea id="content" name="content" class="w-full px-4 py-2 rounded-md border border-gray-300 mb-4" rows="4" required></textarea>
             <button type="submit" class="w-full bg-gray-700 text-white py-2 px-4 rounded-md transition duration-300 hover:bg-gray-600">Add Note</button>
-
         </form>
-
         <div id="notesContainer"></div>
     </div>
 
