@@ -128,4 +128,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-// completyed
+// completed
