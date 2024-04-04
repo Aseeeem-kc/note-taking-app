@@ -13,7 +13,7 @@ app = FastAPI()
 # Enable CORS (Cross-Origin Resource Sharing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # Replace with the origin of your frontend
+    allow_origins=["http://127.0.0.1:5500"], 
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
